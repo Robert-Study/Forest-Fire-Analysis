@@ -3,8 +3,13 @@
 A high-performance, research-grade implementation of a stochastic forest-fire model, including advanced statistical analysis, with visualization tools.
 This project was developed to study **self-organized criticality**, **oscillatory dynamics**, and **scaling laws** in spatially extended systems using large grid simulations.
 
-See interactive demo (hosted on streamlit): https://forest-fire-analysis.streamlit.app/
-See code report: https://1drv.ms/b/c/4a8cd531de3d2eb8/IQDim1tykc0nTKl1fFVf2T52AaR-wLgcwbBSEvPdq3rfR-U?e=T9fe1s
+🔗 **Interactive demo (Streamlit):**  
+https://forest-fire-analysis.streamlit.app/
+
+📄 **Technical report:**  
+https://1drv.ms/b/c/4a8cd531de3d2eb8/IQDim1tykc0nTKl1fFVf2T52AaR-wLgcwbBSEvPdq3rfR-U?e=T9fe1s
+
+---
 
 This code provides:
 
