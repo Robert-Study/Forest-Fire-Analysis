@@ -3,7 +3,10 @@
 A high-performance, research-grade implementation of a stochastic forest-fire model, including advanced statistical analysis, with visualization tools.
 This project was developed to study **self-organized criticality**, **oscillatory dynamics**, and **scaling laws** in spatially extended systems using large grid simulations.
 
-It provides:
+See interative simulation: 
+See code report: https://1drv.ms/b/c/4a8cd531de3d2eb8/IQDim1tykc0nTKl1fFVf2T52AaR-wLgcwbBSEvPdq3rfR-U?e=T9fe1s
+
+This code provides:
 
 - Various optimized simulation engines  
 - Automatic application of time-scales
@@ -11,8 +14,6 @@ It provides:
 - Decaying-sine parameters exploration as power-laws
 - Power-law and truncated power-law fitting of fire sizes
 - Cluster geometry & fractal boundary analysis  
-
----
 
 ## Model overview
 
@@ -33,6 +34,7 @@ Despite its simple rules, the system exhibits:
 
 ## Repository structure
 
+```text
 forest-fire-model/
 ├── code/                         # All source code (library-style, no auto execution)
 │
@@ -58,9 +60,9 @@ forest-fire-model/
 │ │ ├── population_time.py        # Tree/burn fraction vs time plots
 │ │ ├── decaying_sine.py          # Plot decaying-sine fit over time series
 │ │ ├── parameter_sweep.py        # Visualisation of p,f parameter grids
-│ │ ├── equilibrium_coverage_growth.py   # Equilibrium coverage vs p plots
-│ │ ├── equilibrium_coverage_lightning.py# Equilibrium coverage vs f plots
-│ │ ├── angular_frequency_growth.py       # Angular frequency vs p plots
+│ │ ├── equilibrium_coverage_growth.py    # Equilibrium coverage vs p plots
+│ │ ├── equilibrium_coverage_lightning.py # Equilibrium coverage vs f plots
+│ │ ├── angular_frequency_growth.py        # Angular frequency vs p plots
 │ │ ├── exponential_decay_lightning.py    # Decay rate vs f plots
 │ │ ├── power_law.py              # Fire-size distributions with fitted power-law
 │ │ ├── truncated_power_law.py    # Fire-size distributions with truncated power-law
@@ -75,13 +77,13 @@ forest-fire-model/
 ├── requirements.txt              # Python dependencies
 ├── README.md
 └── .gitignore
+```
+
 
 
 ## Project history
 
 This project originally began as a university physics coursework assignment investigating self-organized criticality in forest-fire models, for which it received a grade of 76%.
-A copy of the original report can be found here: .........................
-
 Since then, the codebase has been rewritten and expanded on, with major improvements including:
 
 - Multiple optimized simulation engines
