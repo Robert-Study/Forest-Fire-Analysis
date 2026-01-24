@@ -1,7 +1,6 @@
-# Forest Fire Model – Large-Scale Simulation & Analysis  (Python 3.11)
+# Forest Fire Model – Large-Scale Simulation & Analysis
 
 A high-performance, research-grade implementation of a stochastic forest-fire model, including advanced statistical analysis, with visualization tools.
-
 This project was developed to study **self-organized criticality**, **oscillatory dynamics**, and **scaling laws** in spatially extended systems using large grid simulations.
 
 It provides:
