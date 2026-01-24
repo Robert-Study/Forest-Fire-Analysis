@@ -80,6 +80,7 @@ forest-fire-model/
 │ └── tables/                     # CSV result tables
 │
 ├── requirements.txt              # Python dependencies
+├── streamlit_simulation.py       # Code provided to streamlit for demo
 ├── README.md
 └── .gitignore
 ```
