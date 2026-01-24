@@ -1,0 +1,2 @@
+from .oscillatory_regime import oscillatory_regime_end
+from .simulation_length import critical_regime_start, simulation_length
