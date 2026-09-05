@@ -1,14 +1,14 @@
 # Forest Fire Simulation & Analysis
 
-An optimised Python implementation of a stochastic forest-fire cellular automaton, developed to investigate **self-organised criticality**, **oscillatory population dynamics** and **scaling behaviour**.
+An optimised Python implementation of a stochastic forest-fire cellular automaton, developed to investigate **self-organised criticality, oscillatory population dynamics and fire-size scaling**.
 
-The project began as assessed university coursework and has since been substantially extended into a broader simulation and analysis toolkit, including parameter sweeps, statistical fitting, fire-size analysis, cluster geometry and interactive visualisation.
+The project began as assessed university coursework and has since been substantially extended with larger simulations, parameter sweeps, additional statistical analysis, cluster geometry and an interactive Streamlit demonstration.
 
-> **Academic result:** **74% — First-Class mark.**  
+> **Academic result: 74% — First-Class mark**  
 > The public repository has subsequently been extended beyond the original assessed submission.
 
 🔗 **[Interactive Streamlit Demo](https://forest-fire-analysis.streamlit.app/)**  
-📄 **[View the Technical Report](https://1drv.ms/b/c/4a8cd531de3d2eb8/IQDim1tykc0nTKl1fFVf2T52AaR-wLgcwbBSEvPdq3rfR-U?e=Kbm6k0)**
+📄 **[Technical Report](https://1drv.ms/b/c/4a8cd531de3d2eb8/IQDim1tykc0nTKl1fFVf2T52AaR-wLgcwbBSEvPdq3rfR-U?e=Kbm6k0)**
 
 ---
 
@@ -16,191 +16,209 @@ The project began as assessed university coursework and has since been substanti
 
 ### Rainforest — Good Growth Conditions and Average Storm Activity
 
-**Parameters:** `p = 0.0153` · `f = 0.000153` · `Grid size = 16000`
+**Simulation parameters:** `p = 0.0153` · `f = 0.000153` · `Grid size = 16000`
 
-![Tree coverage and burning population through time]
-<img width="1231" height="457" alt="Population_Plot" src="https://github.com/user-attachments/assets/7e38b3ea-7841-48c1-9fb0-33c6b6b96c5b" />
-*Figure 1. Tree coverage and burning population through time for a high-growth forest-fire simulation. The system exhibits pronounced damped oscillations before approaching an equilibrium state.*
+<p align="center">
+  <img
+    width="1231"
+    alt="Tree coverage and burning population through time"
+    src="https://github.com/user-attachments/assets/7e38b3ea-7841-48c1-9fb0-33c6b6b96c5b"
+  />
+</p>
 
-When tree growth dominates over lightning, dense and highly connected forests form before being disrupted by large fire events. Repeated growth and destruction produces the oscillatory behaviour above, with the amplitude gradually decreasing as the system approaches equilibrium.
+<p align="center">
+  <em>Figure 1. Tree coverage and burning population through time for a high-growth forest-fire simulation. Large fire events produce pronounced damped oscillations before the system approaches equilibrium.</em>
+</p>
 
-The oscillatory population is modelled using a decaying sine function,
+When tree growth dominates over lightning (`f:p = 1:100`), dense and highly connected forests develop before being disrupted by large fire outbreaks. Repeated cycles of growth and destruction produce the damped oscillatory behaviour shown above.
 
-\[
-y(t) = C + Ae^{-Dt}\sin(\omega t + \phi),
-\]
-
-allowing the equilibrium tree coverage, oscillation frequency and exponential decay rate to be quantified.
+The oscillations are modelled using a decaying-sine function to quantify the **equilibrium tree coverage, oscillation frequency and exponential decay rate**, providing a way to characterise the system's progression towards its self-organised regime.
 
 ---
 
-## Highlights
+## Project Highlights
 
 - Large-scale stochastic cellular-automaton simulation written in Python
-- Simulations performed on grids up to **16000 × 16000 cells**
+- Simulations performed on grids up to **16,000 × 16,000 cells**
 - Individual large-scale runs exceeding **2 trillion cell updates**
+- Decaying-sine analysis of tree-population dynamics
 - Self-organised criticality and equilibrium analysis
-- Decaying-sine modelling of population dynamics
-- Power-law relationships between model parameters and observables
 - Pure and truncated power-law modelling of fire-size distributions
 - Automated parameter sweeps across growth and lightning probabilities
 - Cluster area–perimeter scaling and fractal-boundary analysis
-- Interactive Streamlit visualisation
+- Interactive visualisation with Streamlit
 
 ---
 
-## Model Overview
+## Model
 
-The forest-fire model is a stochastic cellular automaton defined on a two-dimensional grid.
-
-Each cell can be in one of three states:
+The forest-fire model operates on a two-dimensional grid in which each cell is either:
 
 - **Empty**
-- **Tree**
+- **Occupied by a tree**
 - **Burning**
 
 At each timestep:
 
-- Empty cells may grow trees with probability **p**
+- Empty cells may grow a tree with probability **p**
 - Trees may ignite spontaneously due to lightning with probability **f**
-- Fire propagates to neighbouring trees
-- Burning cells burn for one frame before becoming empty
+- Fire spreads to neighbouring trees
+- Burning cells become empty after one frame
 
-The simulation uses **periodic boundary conditions**, allowing fire propagation to wrap across the edges of the grid. This prevents boundary cells from behaving differently from cells in the interior.
+The simulation uses **periodic boundary conditions**, allowing fire to wrap across the edges of the grid. This keeps boundary cells statistically equivalent to cells within the interior.
 
-Despite these simple local rules, the system produces complex large-scale behaviour including oscillations, equilibrium states, heavy-tailed fire-size distributions and spatial scaling relationships.
-
----
-
-## Population Dynamics
-
-In high-growth regimes, the forest repeatedly builds towards high tree coverage before large fires rapidly destroy connected regions.
-
-This produces damped oscillations in both the tree and burning populations.
-
-The fitted decaying-sine model provides estimates of:
-
-- Equilibrium tree coverage, **C**
-- Initial oscillation amplitude, **A**
-- Exponential decay coefficient, **D**
-- Angular frequency, **ω**
-- Phase offset, **φ**
-
-The tree and burning populations were also observed to exhibit an approximately **π/2 phase difference**, reflecting the delay between forest growth and subsequent large fire outbreaks.
+Despite these simple local rules, the system produces complex large-scale behaviour including damped population oscillations, equilibrium states, heavy-tailed fire-size distributions and spatial scaling relationships.
 
 ---
 
-## Power-Law Scaling
+## Analysis
 
-Several properties of the model were investigated using power-law relationships.
+### Population Dynamics
 
-The equilibrium tree population was found to vary systematically with both the growth probability **p** and lightning probability **f**.
+Tree coverage and burning fraction are tracked through time.
 
-The exponential decay rate of the oscillations was also found to scale with lightning probability, allowing characteristic timescales to be estimated for the transition from the initial oscillatory regime towards equilibrium.
+High-growth conditions produce pronounced oscillations as large connected forests repeatedly grow and burn. These oscillations gradually decay as the system approaches equilibrium.
 
-These timescales were subsequently used to separate fire-size measurements into different dynamical regions.
+The population behaviour is modelled using a decaying sine of the form:
 
----
+```text
+y(t) = C + A exp(-Dt) sin(ωt + φ)
+```
 
-## Fire-Size Distributions
+where the fitted parameters describe:
 
-Individual fires were assigned unique identifiers at ignition so their propagation could be tracked over time.
+- **C** — equilibrium tree coverage
+- **A** — oscillation amplitude
+- **D** — exponential decay rate
+- **ω** — angular frequency
+- **φ** — phase offset
 
-The total number of cells burned during each event was then used as the fire size.
+The tree and burning populations were also observed to exhibit an approximately **π/2 phase lag**, reflecting the delay between forest build-up and subsequent fire outbreaks.
 
-Near the critical regime, the distribution of fire sizes approximately follows a power law:
+### Parameter Scaling
 
-\[
-N(s) \propto s^{-\alpha}.
-\]
+Several model observables were investigated as functions of the growth probability **p** and lightning probability **f**.
 
-When lightning becomes non-negligible relative to tree growth, very large fires become increasingly suppressed by interactions between separate outbreaks.
+Log-log analysis was used to examine power-law relationships involving:
 
-This behaviour was investigated using a truncated power law,
+- Equilibrium tree coverage
+- Growth probability
+- Lightning probability
+- Oscillation decay rate
 
-\[
-N(s) = As^{-\alpha}e^{-s/s_c},
-\]
+The decay-rate relationship was also used to define characteristic timescales separating the early oscillatory regime from the later equilibrium region.
 
-where \(s_c\) represents the characteristic scale beyond which large fires are increasingly suppressed.
+### Fire-Size Distributions
 
----
+Individual fires are assigned unique identifiers at ignition, allowing their complete evolution to be tracked.
 
-## Cluster Geometry
+The total number of cells burned during each event is then used as the fire size.
 
-The spatial structure of surviving tree clusters was also investigated following fire events.
+Near criticality, the fire-size distribution approximately follows a power law:
+
+```text
+N(s) ∝ s^(-α)
+```
+
+When lightning becomes more significant relative to tree growth, very large fires become increasingly suppressed. This behaviour was investigated using a truncated power law:
+
+```text
+N(s) = A s^(-α) exp(-s/s_c)
+```
+
+where `s_c` defines the characteristic scale beyond which the largest events become increasingly suppressed.
+
+### Cluster Geometry
+
+The geometry of surviving tree clusters was also investigated following fire events.
 
 For each cluster:
 
-- **Area** was measured as the number of occupied tree cells
-- **Perimeter** was measured from the number of exposed cluster edges
+- **Area** was measured from the number of tree cells
+- **Perimeter** was measured from exposed cluster edges
 
-The relationship between cluster perimeter and area was investigated using a power law,
-
-\[
-P \propto A^m,
-\]
-
-providing a route towards characterising the fractal geometry of forest structures near criticality.
+The relationship between cluster area and perimeter was analysed using a power law, providing a route towards characterising the fractal structure of the forest near criticality.
 
 ---
 
 ## Performance & Optimisation
 
-Large simulations are computationally and memory intensive, so significant optimisation was required.
+Large forest-fire simulations are computationally and memory intensive, so substantial optimisation was required.
 
-Key improvements included:
+The implementation includes:
 
 - NumPy-based array operations rather than cell-by-cell Python loops
-- Boolean masks for simulation state calculations
-- Efficient random-number representations for probabilistic updates
-- `np.roll` operations for neighbour propagation
-- Incremental saving of simulation data rather than retaining complete runs in RAM
-- Direct appending of results to CSV files
-- Incremental GIF frame generation
-- Reusable structured parameter sweeps
-- Weighted least-squares fitting using `scipy.curve_fit`
+- Boolean masks for simulation-state calculations
+- Efficient neighbour propagation using `np.roll`
+- Compact probability representations
+- Incremental output to CSV files
+- Incremental GIF generation rather than retaining all frames in RAM
+- Reusable parameter-sweep infrastructure
+- Weighted fitting using `scipy.curve_fit`
 
-Large-scale simulations reached:
+Large runs reached:
 
-- **Grid size:** `L = 16000`
-- **Cells per frame:** `256,000,000`
-- **Run length:** up to `8000` frames
-- **Cell updates per individual run:** over **2 trillion**
+| Property | Scale |
+| --- | ---: |
+| Grid width | **16,000 cells** |
+| Cells per frame | **256 million** |
+| Run length | **up to 8,000 frames** |
+| Cell updates | **2.048 trillion per run** |
 
-Memory overhead for the optimised simulation was reduced to approximately **9.5 bytes per cell**.
+Memory overhead in the optimised implementation was reduced to approximately **9.5 bytes per cell**.
 
 ---
 
 ## Parameter Sweeps
 
-A reusable parameter-sweep framework was developed to explore combinations of growth probability **p** and lightning probability **f**.
+A reusable parameter-sweep framework was developed to explore combinations of **p** and **f** systematically.
 
-A typical sweep uses a **5 × 5 parameter grid**, covering a geometrically spaced range of values spanning approximately two orders of magnitude.
+Typical sweeps use a **5 × 5 grid** of geometrically spaced parameter combinations covering approximately a **100× range**.
 
-This allows relationships between model parameters and emergent properties to be studied systematically rather than through isolated simulations.
+This makes it possible to investigate scaling relationships across model regimes without relying on isolated individual simulations.
 
 ---
 
-## Project History
+## Repository Structure
 
-The project originally began as a university physics coursework assignment investigating self-organised criticality in forest-fire models and received a mark of **74%**.
+```text
+Forest-Fire-Analysis/
+├── code/
+│   ├── core_simulations/        # Cellular-automaton simulation engines
+│   ├── analysis/                # Statistical analysis and fitting
+│   └── display/                 # Plotting and visualisation
+│
+├── outputs/
+│   ├── figures/
+│   ├── gifs/
+│   ├── sweeps/
+│   └── tables/
+│
+├── requirements.txt
+├── streamlit_simulation.py
+├── README.md
+└── .gitignore
+```
 
-Following the assessed submission, the project was substantially extended beyond the original coursework.
+---
 
-Further development included:
+## Project Development
 
-- Larger and more efficient simulation engines
+The original assessed project investigated self-organised criticality in a stochastic forest-fire model and received a mark of **74%**.
+
+Following submission, the project was substantially extended beyond the original coursework, including:
+
+- Larger simulation engines
+- Improved memory handling
 - Automated parameter sweeps
-- Decaying-sine analysis
+- Additional decaying-sine analysis
 - Characteristic timescale estimation
 - Fire identification and size tracking
-- Pure and truncated power-law modelling
+- Truncated power-law modelling
 - Cluster geometry analysis
-- Improved visualisation tools
-- Interactive Streamlit demonstration
+- Interactive Streamlit visualisation
 
-The repository is now maintained as an independent simulation and analysis project rather than a direct copy of the original assessed submission.
+The repository therefore represents an **extended version of the project**, rather than the assessed coursework submission alone.
 
 ---
 
@@ -209,12 +227,11 @@ The repository is now maintained as an independent simulation and analysis proje
 Potential extensions include:
 
 - Radius-of-gyration analysis of tree clusters
-- Estimation of cluster fractal dimension across dynamical regimes
+- Estimation of cluster fractal dimension
 - CCDF-based analysis of fire-size distributions
-- More rigorous statistical comparison of heavy-tail models
+- More rigorous comparison of heavy-tail models
 - Larger parameter sweeps across **p** and **f**
-- Further optimisation of large-grid simulations
-- Comparison of equilibrium tree density estimated from population and fire-size statistics
+- Further optimisation of very large simulations
 
 ---
 
@@ -222,4 +239,5 @@ Potential extensions include:
 
 `Python` · `NumPy` · `SciPy` · `Matplotlib` · `Streamlit` · `tqdm`
 
-**Methods:** numerical simulation · statistical fitting · parameter sweeps · power-law analysis · scientific visualisation · optimisation
+**Methods:** numerical simulation · statistical fitting · parameter sweeps · power-law analysis · data visualisation · optimisation
+
