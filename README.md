@@ -1,15 +1,28 @@
-# Forest Fire Model – Large-Scale Simulation & Analysis
+# Forest Fire Simulation & Analysis
 
-A high-performance, research-grade implementation of a stochastic forest-fire model, including advanced statistical analysis, with visualization tools.
-This project was developed to study **self-organized criticality**, **oscillatory dynamics**, and **scaling laws** in spatially extended systems using large grid simulations.
+An optimised Python implementation of a stochastic forest-fire cellular automaton, developed to investigate self-organised criticality, oscillatory population dynamics and scaling behaviour.
+
+The project began as assessed university coursework and has since been substantially extended into a broader simulation and analysis toolkit, including parameter sweeps, statistical fitting, fire-size analysis and interactive visualisation.
+
+Large-scale runs have processed more than **15 trillion cell updates**.
+
+> **Academic result:** **76% — First-Class standard.** The public repository has subsequently been extended beyond the assessed submission.
+
+## Highlights
+
+- Large-scale stochastic cellular-automaton simulation
+- More than 15 trillion cell updates in extended runs
+- Self-organised criticality and equilibrium analysis
+- Decaying-oscillation fitting
+- Pure and truncated power-law modelling
+- Parameter sweeps and statistical analysis
+- Interactive Streamlit visualisation
 
 🔗 **Interactive demo (Streamlit):**  
 https://forest-fire-analysis.streamlit.app/
 
 📄 **Technical report:**  
 https://1drv.ms/b/c/4a8cd531de3d2eb8/IQDim1tykc0nTKl1fFVf2T52AaR-wLgcwbBSEvPdq3rfR-U?e=T9fe1s
-
----
 
 This code provides:
 
@@ -84,7 +97,6 @@ forest-fire-model/
 ├── README.md
 └── .gitignore                    # For saving data and cache
 ```
-
 
 
 ## Project history
