@@ -184,18 +184,14 @@ This makes it possible to investigate scaling relationships across model regimes
 ```text
 Forest-Fire-Analysis/
 ├── code/
-│   ├── core_simulations/        # Cellular-automaton simulation engines
 │   ├── analysis/                # Statistical analysis and fitting
-│   └── display/                 # Plotting and visualisation
+│   ├── core_simulations/        # Cellular-automaton simulation engines
+│   ├── display/                 # Plotting and visualisation
+│   ├── results/                 # Output-path and saving utilities
+│   └── constants.py             # Shared simulation constants
 │
-├── outputs/
-│   ├── figures/
-│   ├── gifs/
-│   ├── sweeps/
-│   └── tables/
-│
+├── Streamlit_Simulation.py      # Interactive web demonstration
 ├── requirements.txt
-├── streamlit_simulation.py
 ├── README.md
 └── .gitignore
 ```
@@ -240,4 +236,3 @@ Potential extensions include:
 `Python` · `NumPy` · `SciPy` · `Matplotlib` · `Streamlit` · `tqdm`
 
 **Methods:** numerical simulation · statistical fitting · parameter sweeps · power-law analysis · data visualisation · optimisation
-
