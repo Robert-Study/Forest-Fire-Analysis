@@ -40,6 +40,7 @@ The oscillations are modelled using a decaying-sine function to quantify the **e
 
 - Large-scale stochastic cellular-automaton simulation written in Python
 - Simulations performed on grids up to **16,000 × 16,000 cells**
+- More than **15 trillion aggregate cell updates** processed across extended large-scale runs
 - Individual large-scale runs exceeding **2 trillion cell updates**
 - Decaying-sine analysis of tree-population dynamics
 - Self-organised criticality and equilibrium analysis
@@ -156,14 +157,7 @@ The implementation includes:
 - Reusable parameter-sweep infrastructure
 - Weighted fitting using `scipy.curve_fit`
 
-Large runs reached:
-
-| Property | Scale |
-| --- | ---: |
-| Grid width | **16,000 cells** |
-| Cells per frame | **256 million** |
-| Run length | **up to 8,000 frames** |
-| Cell updates | **2.048 trillion per run** |
+A documented large-scale run used a grid of **L = 16,000** for **8,000 frames**, corresponding to **2.048 trillion cell updates**. Across the extended set of large simulations and parameter studies, the project has processed more than **15 trillion aggregate cell updates**.
 
 Memory overhead in the optimised implementation was reduced to approximately **9.5 bytes per cell**.
 
