@@ -1,9 +1,5 @@
 import numpy as np
-import pandas as pd
-import imageio
 from datetime import datetime
-from tqdm import tqdm
-from IPython.display import HTML, display
 
 from code.constants import EMPTY, TREE, FIRE, cmap, fps
 
@@ -48,8 +44,12 @@ def update_forest(board, p, f):
     return new_board
 
 def run_simulation(L, frames, p, f, gif, save_2_file):
+    import pandas as pd
+    from tqdm import tqdm
     
     if gif: # if gif (bool) is True record gif data
+        import imageio
+
         gif_name = f"forest_fire_{datetime.now().strftime('%H%M%S')}.gif"  #datetime.now() provides time stamp for files (uniquely idenitifyible) helpful for debugging
         writer = imageio.get_writer(gif_name, mode="I", fps=fps)  #"I" = multi-image gif, fps capped at 60
 
@@ -67,6 +67,8 @@ def run_simulation(L, frames, p, f, gif, save_2_file):
             writer.append_data(snapshot)      # Append directly to gif (avoids RAM buildup unlike provided code) (less crashing / larger simulations possible)
                                               # Old method crashed for 8GB of RAM < 53 frames for a 5000x5000 (3 bytes for RBG per cell and per frame)
     if gif:  
+        from IPython.display import HTML, display
+
         writer.close()      # Finalise gif (enables arbitrarily long animations)
         print(f"Saved animation: {gif_name}") 
         display(HTML(f"""<style>img.pixelated {{image-rendering: pixelated;image-rendering: crisp-edges;}}</style><div style='text-align:center;'><img class='pixelated'src='{gif_name}' width='{600}'></div>"""))

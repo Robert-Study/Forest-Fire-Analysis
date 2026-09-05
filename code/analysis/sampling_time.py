@@ -1,5 +1,7 @@
-"""Sampling-time policies (e.g., sample when a fire ends).
+"""Sampling policies used by the cluster-analysis simulations."""
 
-This module is included to match the project layout.
-Populate with your analysis/plotting logic as you port it from notebooks.
-"""
+
+def sample_when_fire_ends(previous_fire_cells, current_fire_cells):
+    """Return True on the first frame after all active fire has extinguished."""
+    return previous_fire_cells > 0 and current_fire_cells == 0
+
