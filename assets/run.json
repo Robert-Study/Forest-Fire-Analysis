@@ -1,0 +1,17 @@
+{
+  "seed": 42,
+  "size": 256,
+  "frames": 2000,
+  "p_requested": 0.0153,
+  "f_requested": 0.000153,
+  "p_effective": 0.015299999853596091,
+  "f_effective": 0.0001529997680336237,
+  "probability_bits": 32,
+  "python": "3.12.13",
+  "numpy": "2.3.5",
+  "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+  "cell_time_updates": 131072000,
+  "simulation_and_csv_seconds": 0.8829389450000349,
+  "cell_time_updates_per_second": 148449675.6454602,
+  "timing_scope": "Simulation, population counting and CSV output; excludes plotting."
+}

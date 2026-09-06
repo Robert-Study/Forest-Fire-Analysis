@@ -302,99 +302,16 @@ def board_to_rgb_upscaled_id(board, fire_id, fire_colors):
 
 # ------------------------- simulation updates -------------------------
 def update_forest_counts_noid(board, tree_count, fire_count, growth, ignition):
-    new = board.copy()
-    empty = (board == EMPTY)
-    tree = (board == TREE)
-    fire = (board == FIRE)
-    rand = np.random.randint(0, 65536, size=board.shape, dtype=np.uint16)
-
-    new[fire] = EMPTY
-
-    up = np.roll(fire, -1, axis=0)
-    down = np.roll(fire, 1, axis=0)
-    left = np.roll(fire, -1, axis=1)
-    right = np.roll(fire, 1, axis=1)
-    fire_neighbors = up | down | left | right
-
-    ignite_from_neighbors = tree & fire_neighbors
-    ignite_spontaneous = tree & (rand < int(65536 * ignition))
-    grow = empty & (rand < int(65536 * growth))
-    ignited = ignite_from_neighbors | ignite_spontaneous
-
-    new[ignited] = FIRE
-    new[grow] = TREE
-
-    trees_lost = int(np.count_nonzero(ignited))
-    trees_gained = int(np.count_nonzero(grow))
-    fires_lost = int(np.count_nonzero(fire))
-    fires_gained = trees_lost
-
-    tree_count = tree_count - trees_lost + trees_gained
-    fire_count = fire_count - fires_lost + fires_gained
-    return new, tree_count, fire_count
+    from forest_fire.core_simulations.fast_simulation import update_forest
+    new = update_forest(board, growth, ignition)
+    return new, int(np.count_nonzero(new == TREE)), int(np.count_nonzero(new == FIRE))
 
 
 def update_forest_counts_id(board, fire_id, next_id, tree_count, fire_count, growth, ignition, use_uint32=False):
-    new_board = board.copy()
-    new_id = fire_id.copy()
-
-    empty = (board == EMPTY)
-    tree = (board == TREE)
-    burning = (board == FIRE)
-
-    if use_uint32:
-        scale = 4294967296
-        rand = np.random.randint(0, scale, size=board.shape, dtype=np.uint32)
-    else:
-        scale = 65536
-        rand = np.random.randint(0, scale, size=board.shape, dtype=np.uint16)
-
-    new_board[burning] = EMPTY
-    new_id[burning] = -1
-
-    up = np.roll(burning, -1, axis=0)
-    down = np.roll(burning, 1, axis=0)
-    left = np.roll(burning, -1, axis=1)
-    right = np.roll(burning, 1, axis=1)
-    fire_neighbors = up | down | left | right
-
-    upID = np.roll(fire_id, -1, axis=0)
-    downID = np.roll(fire_id, 1, axis=0)
-    leftID = np.roll(fire_id, -1, axis=1)
-    rightID = np.roll(fire_id, 1, axis=1)
-
-    neighbor_ids = np.stack([upID, downID, leftID, rightID])
-    inf = np.iinfo(np.int32).max
-    valid = np.where(neighbor_ids >= 0, neighbor_ids, inf)
-    min_ids = np.min(valid, axis=0)
-    min_ids[min_ids == inf] = -1
-
-    ignite_from_neighbors = tree & fire_neighbors
-    ignite_spontaneous = tree & (rand < int(scale * ignition))
-    ignited = ignite_from_neighbors | ignite_spontaneous
-
-    new_board[ignite_from_neighbors] = FIRE
-    new_id[ignite_from_neighbors] = min_ids[ignite_from_neighbors].astype(np.int32)
-
-    if np.any(ignite_spontaneous):
-        coords = np.where(ignite_spontaneous)
-        k = int(coords[0].size)
-        ids = np.arange(next_id, next_id + k, dtype=np.int32)
-        new_board[ignite_spontaneous] = FIRE
-        new_id[coords] = ids
-        next_id += k
-
-    grow = empty & (rand < int(scale * growth))
-    new_board[grow] = TREE
-
-    trees_lost = int(np.count_nonzero(ignited))
-    trees_gained = int(np.count_nonzero(grow))
-    fires_lost = int(np.count_nonzero(burning))
-    fires_gained = trees_lost
-
-    tree_count = tree_count - trees_lost + trees_gained
-    fire_count = fire_count - fires_lost + fires_gained
-    return new_board, new_id, next_id, tree_count, fire_count
+    from forest_fire.core_simulations.id_simulation import update_forest_ID
+    bits = 32 if use_uint32 or any(0 < x < 1 / 65536 for x in (growth, ignition)) else 16
+    new, ids, next_id = update_forest_ID(board, fire_id, growth, ignition, next_id, 0, probability_bits=bits)
+    return new, ids, next_id, int(np.count_nonzero(new == TREE)), int(np.count_nonzero(new == FIRE))
 
 
 # ------------------------- fire size statistics -------------------------
@@ -430,7 +347,7 @@ def fit_powerlaw(s_fit, c_fit):
 
 def fit_truncated_powerlaw(s_fit, c_fit):
     lower = [0.0, 0.0, 1.0]
-    upper = [np.inf, 10.0, float(np.max(s_fit))]
+    upper = [np.inf, np.inf, np.inf]
     params, cov = curve_fit(
         truncated_powerlaw_model,
         s_fit,
@@ -448,14 +365,9 @@ def fit_truncated_powerlaw(s_fit, c_fit):
 def plot_counts_with_two_models(sizes: np.ndarray, L: int):
     x, y = size_counts_no_binning(sizes)
     if x is None or x.size < 10:
-        return None, {"power": None, "trunc": None}, "Not enough critical-regime fires."
+        return None, {"power": None, "trunc": None}, "Not enough completed fires after the transient."
 
-    # Keep cap for counts plot (per your earlier design); perimeter cap removed elsewhere.
-    mask = x <= float(L)
-    x = x[mask]
-    y = y[mask]
-    if x.size < 10:
-        return None, {"power": None, "trunc": None}, "Not enough points after capping at grid size."
+    # Event size is a count of burned cells, not the linear grid width.
 
     fits = {"power": None, "trunc": None}
 
@@ -483,7 +395,7 @@ def plot_counts_with_two_models(sizes: np.ndarray, L: int):
     colors = [(230 / 255, 230 / 255, 230 / 255, float(a)) for a in alpha_vals]
     ax.scatter(x, y, s=sizes_pts, c=colors, marker="o", label="Data")
 
-    x_ref = np.logspace(np.log10(max(1.0, x.min())), np.log10(min(float(L), x.max())), 400)
+    x_ref = np.logspace(np.log10(max(1.0, x.min())), np.log10(x.max()), 400)
 
     try:
         A1, a1, _, _, r2p = fit_powerlaw(x, y)
@@ -518,10 +430,10 @@ def plot_counts_with_two_models(sizes: np.ndarray, L: int):
 
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.set_xlim(1, float(L))
+    ax.set_xlim(1, max(2.0, float(x.max()) * 1.05))
     ax.set_xlabel("Fire size (s)", color="#d0d0d0")
     ax.set_ylabel("Count N(s)", color="#d0d0d0")
-    ax.set_title("Counts of different fire sizes (critical regime)", color="#e6e6e6")
+    ax.set_title("Counts of different fire sizes (post-transient window)", color="#e6e6e6")
 
     leg = ax.legend(frameon=True)
     leg.get_frame().set_facecolor("#0e1117")
@@ -1031,26 +943,10 @@ def build_fire_size_arrays_critical_only(ss):
     if (not ss.locked_track_ids) or (ss.fire_total_burn is None) or (ss.fire_ignition is None):
         return np.array([], dtype=int), np.array([], dtype=int)
 
-    ncrit = int(ss.locked_ncrit)
-    sizes = []
-    perims = []
-
-    for fid, total in ss.fire_total_burn.items():
-        t0 = ss.fire_ignition.get(fid, 0)
-
-        # critical analysis starts at Ncrit
-        if t0 > ncrit:
-            s = int(total)
-
-            # keep cap ONLY for counts plot (perimeter should NOT be capped)
-            if bool(ss.locked_plot_counts) and (s > int(ss.locked_L)):
-                continue
-
-            sizes.append(s)
-            if ss.locked_plot_perim and ss.fire_perimeter is not None:
-                perims.append(int(ss.fire_perimeter.get(fid, 0)))
-
-    return np.array(sizes, dtype=int), np.array(perims, dtype=int)
+    from forest_fire.analysis.event_statistics import completed_fire_sizes
+    active_ids = np.unique(ss.fire_id[ss.fire_id >= 0])
+    return completed_fire_sizes(ss.fire_total_burn, ss.fire_ignition, active_ids,
+                                int(ss.locked_ncrit), ss.fire_perimeter if ss.locked_plot_perim else None)
 
 
 # ------------------------- UI callbacks -------------------------
@@ -1102,8 +998,10 @@ label[data-testid="stWidgetLabel"] p { white-space: pre-line; }
     unsafe_allow_html=True,
 )
 
-# Main title: requested capitalization
+# Project title
 st.markdown("<h1 style='margin-bottom: 0.2rem;'>Forest Fire Simulation</h1>", unsafe_allow_html=True)
+
+st.caption("Explore a stochastic lattice model. Post-transient sampling uses an empirical timing rule; fitted power laws are exploratory.")
 
 init_defaults()
 ss = st.session_state
@@ -1179,13 +1077,13 @@ with st.sidebar:
         "Fire size\nvs Counts",
         key="plot_size_counts",
         disabled=locked_controls,
-        help="Analysis of the frequency of different sizes of fires in the critical regime.",
+        help="Analysis of the frequency of different sizes of fires in the post-transient window.",
     )
     st.checkbox(
         "Fire size vs perimeter",
         key="plot_size_perimeter",
         disabled=locked_controls,
-        help="Analysis of the size, perimeter relation of fires in the critical regime. Typically found at 1<<Growth<<Ignition (may require uint32 for small probabilities).",
+        help="Analysis of the size, perimeter relation of fires in the post-transient window. Typically found at ignition << growth << 1 (may require uint32 for small probabilities).",
     )
 
     st.divider()
@@ -1358,7 +1256,7 @@ if hasattr(ss, "locked_enable_anim") and bool(ss.locked_enable_anim):
                     st.markdown("<h3 style='margin-top: 1rem; margin-bottom: 0.2rem;'>Fire size vs perimeter</h3>", unsafe_allow_html=True)
                     mask = (sizes > 0) & (perims > 0)
                     if np.count_nonzero(mask) < 20:
-                        st.info("Not enough critical-regime fires with perimeter data.")
+                        st.info("Not enough completed fires after the transient with perimeter data.")
                     else:
                         fig, ax = plt.subplots(figsize=(11.0, 4.2), dpi=120)
                         fig.patch.set_facecolor("#0e1117")
@@ -1375,7 +1273,7 @@ if hasattr(ss, "locked_enable_anim") and bool(ss.locked_enable_anim):
                         ax.set_xlim(1, max(2.0, xmax))
                         ax.set_xlabel("Fire size (s)", color="#d0d0d0")
                         ax.set_ylabel("Perimeter", color="#d0d0d0")
-                        ax.set_title("Fire size vs perimeter (critical regime)", color="#e6e6e6")
+                        ax.set_title("Fire size vs perimeter (post-transient window)", color="#e6e6e6")
                         fig.tight_layout()
                         st.pyplot(fig, use_container_width=True)
 
@@ -1453,7 +1351,7 @@ else:
                 # --------------------------------
 
                 if np.count_nonzero(mask) < 10:
-                    st.info("Not enough critical-regime fires with perimeter data.")
+                    st.info("Not enough completed fires after the transient with perimeter data.")
                 else:
                     fig, ax = plt.subplots(figsize=(11.0, 4.2), dpi=120)
                     fig.patch.set_facecolor("#0e1117")
@@ -1481,7 +1379,7 @@ else:
 
                     ax.set_xlabel("Fire size (s)", color="#d0d0d0")
                     ax.set_ylabel("Perimeter", color="#d0d0d0")
-                    ax.set_title("Fire size vs perimeter (critical regime)", color="#e6e6e6")
+                    ax.set_title("Fire size vs perimeter (post-transient window)", color="#e6e6e6")
 
                     fig.tight_layout()
                     st.pyplot(fig, use_container_width=True)
