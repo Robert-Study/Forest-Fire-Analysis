@@ -24,4 +24,4 @@ jobs:
       - name: Run regression tests
         run: python -m unittest discover -s tests -v
       - name: Run the documented example
-        run: python demo.py
+        run: python -m forest_fire.demo

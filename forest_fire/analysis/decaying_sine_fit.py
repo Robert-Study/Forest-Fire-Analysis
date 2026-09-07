@@ -35,13 +35,13 @@ def analyse_decaying_sine(tree_counts, burn_counts, L, show_plots):
 
     if show_plots:  # Helpful for the report. Fits and plots are kept separate so the program runs faster.
 
-           # Plot 1 — Tree percentage with fitted curve
+           # Plot 1 : Tree percentage with fitted curve
         plt.figure(figsize=(12,5))
         plt.plot(t_full, tree_pct, 'g-',  label="Tree Population Simulated", linewidth=2, alpha=0.4)
         plt.plot(t_full[crop:], tree_model_segment, 'k--', label="Decaying Sine Wave Model", linewidth=1, alpha=0.6)
         # Extracting individual parameters to include in title
         tree_params = f"(C={params_tree[0]:.1f}±{errors_tree[0]:.2f}, A={params_tree[1]:.1f}±{errors_tree[1]:.2f}, d={params_tree[2]:.5f}±{errors_tree[2]:.5f}, ω={params_tree[3]:.3f}±{errors_tree[3]:.3f}, φ={params_tree[4]:.2f}±{errors_tree[4]:.2f}, R²={r2_tree:.3f})"
-        plt.title(f"Tree Population % — Decaying Sine Fit\n{tree_params}")
+        plt.title(f"Tree Population % : Decaying Sine Fit\n{tree_params}")
         plt.legend()
         plt.grid(alpha=0.3)
         plt.xlabel("Time (frames)")
@@ -63,12 +63,12 @@ def analyse_decaying_sine(tree_counts, burn_counts, L, show_plots):
             burn_model_segment = decaying_sine(t_fit, *params_burn)
             r2_burn = 1 - np.sum((burn_fit_y - burn_model_segment)**2) / np.sum((burn_fit_y - np.mean(burn_fit_y))**2) #fits close to 1 are accurate
 
-               # Plot 2 — Burn percentage with fitted curve
+               # Plot 2 : Burn percentage with fitted curve
             plt.figure(figsize=(12,5))
             plt.plot(t_full, burn_pct, 'r-',  label="Tree Population Simulated", linewidth=2, alpha=0.4)
             plt.plot(t_full[crop:], burn_model_segment, 'k--', label="Decaying Sine Wave Model", linewidth=1, alpha=0.6)
             burn_params = f"(C={params_burn[0]:.1f}±{burn_errors[0]:.2f}, A={params_burn[1]:.1f}±{burn_errors[1]:.2f}, d={params_burn[2]:.5f}±{burn_errors[2]:.5f}, ω={params_burn[3]:.3f}±{burn_errors[3]:.3f}, φ={params_burn[4]:.2f}±{burn_errors[4]:.2f}, R²={r2_burn:.3f})"
-            plt.title(f"Burn Population % — Decaying Sine Fit\n{burn_params}")
+            plt.title(f"Burn Population % : Decaying Sine Fit\n{burn_params}")
             plt.grid(alpha=0.3)
             plt.xlim(0, t_full[-1])
             plt.legend()

@@ -20,11 +20,11 @@ def update_forest_ID(board, fire_id, p, f, next_id, t, rng=None, probability_bit
     Burning_idx = (board == FIRE)
     random_grid = random_grid_for(board, rng, probability_bits)
 
-    # Condition 1 — Burning cells become empty
+    # Condition 1 : Burning cells become empty
     new_board[Burning_idx] = EMPTY
     new_id[Burning_idx]    = -1    # Remove fire ID once burning has finished (-1 represents no fire)
 
-    # Condition 2 — Fire spreads to neighbouring trees (ID propagation)
+    # Condition 2 : Fire spreads to neighbouring trees (ID propagation)
     up    = np.roll(Burning_idx, -1, axis=0)
     down  = np.roll(Burning_idx,  1, axis=0) # Neighbour detection (same spatial logic as base model)
     left  = np.roll(Burning_idx, -1, axis=1)
@@ -51,7 +51,7 @@ def update_forest_ID(board, fire_id, p, f, next_id, t, rng=None, probability_bit
     new_id[fire_spread_idx]    = min_ids[fire_spread_idx].astype(np.int32) # If not then take the smallest neighbouring ID and assign it
                                            # Signed int32 supports positive IDs up to 2,147,483,647; allocation is checked below.
 
-    # Condition 3 — Lightning ignition (unique ID assignment)
+    # Condition 3 : Lightning ignition (unique ID assignment)
     lightning_idx = Tree_idx & ~fire_neighbours & (random_grid < int(f * 2**probability_bits))
 
     if np.any(lightning_idx):
@@ -66,7 +66,7 @@ def update_forest_ID(board, fire_id, p, f, next_id, t, rng=None, probability_bit
 
         next_id += np.sum(lightning_idx)  # advance ID counter
 
-    # Condition 4 — Tree growth on empty cells
+    # Condition 4 : Tree growth on empty cells
     grow_idx = Empty_idx & (random_grid < int(p * 2**probability_bits))
     new_board[grow_idx] = TREE
 
